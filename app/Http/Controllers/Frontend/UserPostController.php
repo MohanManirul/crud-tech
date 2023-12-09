@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PostCrudRequest;
 use App\Models\Post;
+use App\Services\PostCrudService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
@@ -14,20 +16,23 @@ use Exception;
 
 class UserPostController extends Controller
 {
+    protected $folderPath;
+    protected $PostCrudService;
+    public function __construct(PostCrudService $PostCrudService)
+    {
+        $this->folderPath = 'frontend.posts.';
+        $this->PostCrudService = $PostCrudService ;
+    }
     public function index(){
-        return view('frontend.posts.all-posts');
+        return view($this->folderPath.'all-posts');
     }
 
    public function create(){
-    return view('frontend.posts.create');
+    return view($this->folderPath.'create');
    }
 
    public function store(Request $request){
-    $validator = Validator::make($request->all(), [
-        "title" => "required",
-        "image" => "required|image|mimes:jpeg,jpg,png,gif,svg|max:2048",
-
-    ]);
+   
     try{
 
         $post = new Post();
@@ -40,7 +45,13 @@ class UserPostController extends Controller
             Image::make($image)->save($location);
             $post->image = $img;
         }
-        
+        $post->title = $request->title;
+        $post->created_by = getAuthUserId();
+        $post->created_user_type = getAuthUserType();
+        if($post->save()) {
+            $redirectRoute = route('user.post.all');
+            return response()->json(['redirect' => $redirectRoute , 'redirectMessage' => 'Post Created Successfully'],200);               
+        }
     }catch(Exception $e){
         return response()->json(['success' => 'Post Created'], 200);
 

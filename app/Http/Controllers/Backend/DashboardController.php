@@ -7,7 +7,14 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    public function index(){
-        return "super admin dashboard";
+    // //index
+    public function index()
+    {
+        if ( auth('super_admin')->check()) {
+
+            return view('backend.dashboard');
+        } else {
+            return view('errors.404');
+        }
     }
 }

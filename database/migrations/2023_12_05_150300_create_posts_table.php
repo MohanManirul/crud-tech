@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title')->unique();
             $table->string('image')->nullable();
             $table->enum('created_user_type', ['super_admin','user'])->nullable();
             $table->foreignId('created_by')->nullable();
