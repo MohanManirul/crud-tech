@@ -58,6 +58,7 @@ class UserPostController extends Controller
     }
     return view('frontend.posts.create');
    }
+   
    public function update(Request $request){
     $validator = Validator::make($request->all(), [
         "title" => "required",
